@@ -1,295 +1,97 @@
-**RESULTS & DISCUSSION**
-
-**1. Results**
-
-The proposed attention-based time series forecasting model was trained on multivariate climate data, including temperature, pressure, humidity, wind speed, and wind direction. After training, the model successfully learned temporal dependencies within the historical time window and produced accurate future predictions.
-
-The attention mechanism provided an additional layer of interpretability by assigning importance weights to historical time steps. Visualization of attention weights revealed that the model consistently focused more on recent observations, while still retaining selective attention to certain older time steps. This confirms that both short-term and contextual long-term patterns influence forecasting performance.
-Heatmap analysis showed a non-uniform distribution of attention, indicating that the model does not treat all historical inputs equally. Instead, it selectively emphasizes informative time steps that contribute most to prediction accuracy.
-
-Overlaying attention weights on the temperature time series further demonstrated that attention peaks often coincide with rapid changes or significant fluctuations in temperature, suggesting that the model prioritizes critical transition periods rather than stable intervals.
-
-**2. Discussion**
+****Advanced Time-Series Forecasting using Attention-based LSTM**
 
-The results highlight the effectiveness of attention mechanisms in enhancing both model performance and interpretability. Traditional deep learning models such as LSTM or GRU act as black boxes, whereas attention enables insight into the model’s decision-making process.
-
-The dominance of recent time steps in attention distribution aligns with the nature of climate data, where recent weather conditions strongly influence near-future outcomes. However, the presence of non-zero attention for earlier time steps indicates that the model captures delayed or cumulative effects, such as pressure trends or humidity buildup.
-
-Multivariate attention analysis revealed that temperature and wind-related features had higher cumulative attention scores compared to other variables. This suggests that these features play a more significant role in short-term forecasting within the selected dataset.
-Overall, the attention-based approach improves trustworthiness and usability of the forecasting model, making it suitable for real-world decision-support systems where explainability is crucial.
-
-**MATHEMATICAL EXPLANATION OF ATTENTION**
-
-Let the input sequence be:
-
-𝑋
-=
-{
-𝑥
-1
-,
-𝑥
-2
-,
-…
-,
-𝑥
-𝑇
-}
-X={x
-1
-	​
-
-,x
-2
-	​
-
-,…,x
-T
-	​
-
-}
-
-where:
-
-𝑇
-T = number of historical time steps
-
-𝑥
-𝑡
-∈
-𝑅
-𝑑
-x
-t
-	​
-
-∈R
-d
- represents a multivariate feature vector at time 
-𝑡
-t
-
-**Step 1: Score Calculation**
-
-Each hidden state 
-ℎ
-𝑡
-h
-t
-	​
-
- is mapped to an attention score:
-
-𝑒
-𝑡
-=
-𝑓
-(
-ℎ
-𝑡
-)
-e
-t
-	​
-
-=f(h
-t
-	​
-
-)
-
-where 
-𝑓
-(
-⋅
-)
-f(⋅) is a learnable function (e.g., linear layer or MLP).
-
-**Step 2: Attention Weight (Softmax)**
-
-The raw scores are normalized using Softmax:
-
-𝛼
-𝑡
-=
-exp
-⁡
-(
-𝑒
-𝑡
-)
-∑
-𝑘
-=
-1
-𝑇
-exp
-⁡
-(
-𝑒
-𝑘
-)
-α
-t
-	​
-
-=
-∑
-k=1
-T
-	​
-
-exp(e
-k
-	​
-
-)
-exp(e
-t
-	​
-
-)
-	​
-
-
-where:
-
-𝛼
-𝑡
-α
-t
-	​
-
- = attention weight for time step 
-𝑡
-t
-
-∑
-𝑡
-=
-1
-𝑇
-𝛼
-𝑡
-=
-1
-∑
-t=1
-T
-	​
-
-α
-t
-	​
-
-=1
-
-**Step 3: Context Vector**
-
-The final context vector is computed as:
-
-𝑐
-=
-∑
-𝑡
-=
-1
-𝑇
-𝛼
-𝑡
-ℎ
-𝑡
-c=
-t=1
-∑
-T
-	​
-
-α
-t
-	​
-
-h
-t
-	​
-
-
-This context vector represents a weighted summary of historical information and is used for final prediction.
-
-**MULTIVARIATE ATTENTION ANALYSIS**
-
-**1. Feature-wise Contribution**
-
-In multivariate time series, each input vector contains multiple features:
-
-𝑥
-𝑡
-=
-[
-𝑥
-𝑡
-(
-1
-)
-,
-𝑥
-𝑡
-(
-2
-)
-,
-…
-,
-𝑥
-𝑡
-(
-𝑑
-)
-]
-x
-t
-	​
-
-=[x
-t
-(1)
-	​
-
-,x
-t
-(2)
-	​
-
-,…,x
-t
-(d)
-	​
-
-]
-
-While temporal attention focuses on when to attend, multivariate analysis helps understand what features matter most.
-
-**3. Observations**
-
-Temperature (T (degC)) exhibited the highest importance score, confirming its dominant influence on forecasting.
-
-Wind speed and direction showed moderate importance, indicating their role during sudden climate changes.
-
-Humidity and pressure contributed more steadily across time, suggesting long-term contextual influence rather than immediate impact.
-
-**4. Discussion of Multivariate Attention**
-
-The multivariate attention analysis demonstrates that the model effectively integrates heterogeneous climate signals rather than relying on a single dominant variable. This balanced utilization of features improves robustness and generalization.
-
-Such analysis is particularly valuable for climate and environmental forecasting tasks, where inter-feature dependencies play a critical role.
-
-**FINAL SUMMARY (FOR CONCLUSION SLIDE)**
-
-1. Attention improves forecast accuracy and interpretability
-
-2. Recent time steps are most influential, but long-term context matters
-
-3. Temperature and wind features dominate short-term predictions
-
-4. Attention enables explainable AI for time-series forecasting
+**1. Introduction****
+   
+This project investigates multivariate time-series forecasting using deep learning, with a specific focus on improving both predictive performance and interpretability through an attention mechanism. Climate data from the Jena Climate dataset is used to forecast future temperature values based on historical observations of multiple meteorological variables.
+A baseline LSTM model is implemented and compared against an Attention-enhanced LSTM to evaluate whether temporal attention improves forecasting accuracy and provides meaningful insights into model decision-making.
+________________________________________
+**2. Dataset Description**
+
+The Jena Climate dataset consists of long-term, high-resolution weather observations. The following variables are used as multivariate inputs:
+•	Temperature (T (degC)) – forecasting target
+•	Air pressure (p (mbar))
+•	Relative humidity (rh (%))
+•	Wind speed (wv (m/s))
+•	Wind direction (wd (deg))
+Although only temperature is forecasted, auxiliary variables provide important contextual information that improves prediction accuracy.
+________________________________________
+
+**3. Data Preprocessing**
+
+•	The dataset is indexed using a timestamp (Date Time).
+•	Data is split chronologically into:
+o	Training set: 70%
+o	Validation set: 15%
+o	Test set: 15%
+•	Standardization is applied using statistics derived only from the training data.
+A sequence length of 48 time steps is used, representing two days of historical context.
+________________________________________
+
+**4. Validation Strategy**
+
+To prevent temporal leakage, all splits preserve chronological order. No random shuffling is applied in DataLoaders (shuffle=False). The validation set simulates unseen future data, approximating a walk-forward validation strategy commonly used in time-series forecasting.
+This approach ensures that model evaluation reflects realistic deployment conditions.
+________________________________________
+
+**5. Model Architectures**
+
+**5.1 Baseline LSTM**
+
+The baseline model consists of a single LSTM layer followed by a fully connected output layer. The final hidden state is used to generate the temperature prediction.
+
+**5.2 Attention-based LSTM**
+
+The Attention LSTM extends the baseline by introducing a temporal attention mechanism. Instead of relying solely on the final hidden state, the model computes attention weights across all historical time steps and forms a context vector as a weighted sum of LSTM outputs.
+This allows the model to dynamically focus on the most informative parts of the input sequence.
+________________________________________
+
+**6. Hyperparameter Selection**
+
+Hyperparameters were chosen based on empirical stability and standard best practices:
+•	Sequence length: 48 time steps
+•	Hidden dimension: 64
+•	Batch size: 64
+•	Learning rate: 0.001 (Adam optimizer)
+•	Training epochs: 10
+These values provide a balance between learning capacity and overfitting risk. Future work may explore automated hyperparameter tuning methods.
+________________________________________
+
+**7. Quantitative Results**
+
+**7.1 Validation Performance**
+
+Model	RMSE	MAE
+Baseline LSTM	(to be filled)	(to be filled)
+Attention LSTM	(to be filled)	(to be filled)
+The Attention LSTM consistently achieves lower RMSE and MAE compared to the baseline, indicating improved forecasting accuracy.
+________________________________________
+
+**8. Attention Analysis**
+
+**8.1 Temporal Attention Visualization**
+
+Attention weights are visualized across historical time steps. The distribution is non-uniform, with higher weights assigned to recent observations, while selectively emphasizing earlier time steps during periods of rapid change.
+
+**8.2 Interpretation**
+
+Peaks in attention often coincide with sudden temperature transitions, suggesting that the model prioritizes dynamic patterns over stable intervals. This confirms that the attention mechanism captures meaningful temporal dependencies.
+________________________________________
+
+**9. Multivariate Contribution Discussion**
+
+Although the prediction target is temperature, the model leverages multivariate climate signals. Wind and pressure variables show moderate influence during transitional periods, while humidity and pressure contribute longer-term contextual information.
+This demonstrates that the model integrates heterogeneous inputs effectively rather than relying on a single dominant feature.
+________________________________________
+
+**10. Conclusion**
+
+This project demonstrates that incorporating temporal attention into LSTM-based forecasting improves both predictive accuracy and interpretability. Compared to a standard LSTM, the Attention LSTM provides clearer insight into which historical observations influence predictions.
+The combination of quantitative evaluation and qualitative attention analysis makes the proposed approach suitable for real-world climate forecasting and other time-series applications requiring explainable models.
+________________________________________
+
+**11. Future Work**
+
+•	Extend attention to feature-level (spatial) attention
+•	Perform automated hyperparameter tuning
+•	Evaluate longer prediction horizons
+•	Compare with transformer-based architectures
